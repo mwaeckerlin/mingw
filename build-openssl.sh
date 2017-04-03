@@ -7,6 +7,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
 
+version=
 download=0
 while test $# -gt 0; do
     case "$1" in
@@ -17,6 +18,7 @@ $0 [OPTIONS]
 OPTIONS:
 
   -h, --help      show this help
+  -v, --version   specify version string
   -d, --download  download sources
                   otherwise sources must be in $(pwd)
 
@@ -32,8 +34,13 @@ EOF
             exit
             ;;
         (-d|--download) download=1;;
-        (*) echo "unknown option: $1" 1>&2; exit 1;;
+        (-v|--version) shift; version="$1";;
+        (*) echo "ERROR: unknown option: $1" 1>&2; exit 1;;
     esac
+    if ! test $# -gt 0; then
+        echo "ERROR: missing parameter" 1>&2
+        exit 1
+    fi
     shift
 done
 
@@ -42,15 +49,23 @@ set -x
 cd ${WORKSPACE}
 if test $download -eq 1; then
     source=https://www.openssl.org/source
-    file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-[0-9][^"]*\.tar\.gz\)".*,\1,p'  | head -1)
+    if test -n "$version"; then
+        file=openssl-${version}.tar.gz
+    else
+        file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-[0-9][^"]*\.tar\.gz\)".*,\1,p'  | head -1)
+    fi
     path=${file%.tar.gz}
     wget -qO$file $source/$file
     tar xf $file
     cd $path
 else
-    path=$(pwd | sed 's,.*/,,')
+    if test -n "$version"; then
+        path=openssl-${version}
+    else
+        path=$(pwd | sed 's,.*/,,')
+    fi
 fi
-version=${path#openssl-}
+version=${version:-${path#openssl-}}
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+[a-z]$ ]] && [ "$path" = "openssl-${version}" ]
 
 echo "Version: $version"

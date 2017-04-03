@@ -7,6 +7,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
 
+version=
 download=0
 while test $# -gt 0; do
     case "$1" in
@@ -17,6 +18,7 @@ $0 [OPTIONS]
 OPTIONS:
 
   -h, --help      show this help
+  -v, --version   specify version string
   -d, --download  download sources
                   otherwise sources must be in $(pwd)
 
@@ -32,8 +34,13 @@ EOF
             exit
             ;;
         (-d|--download) download=1;;
-        (*) echo "unknown option: $1" 1>&2; exit 1;;
+        (-v|--version) shift; version="$1";;
+        (*) echo "ERROR: unknown option: $1" 1>&2; exit 1;;
     esac
+    if ! test $# -gt 0; then
+        echo "ERROR: missing parameter" 1>&2
+        exit 1
+    fi
     shift
 done
 
@@ -41,11 +48,24 @@ set -x
 
 cd ${WORKSPACE}
 if test $download -eq 1; then
-    version=$(wget -qO- http://source.icu-project.org/repos/icu/icu/tags | sed -n 's,.*href="release-\([0-9]\+-[0-9]\+\)/".*,\1,p' | tail -1)
+    if test -z "$version"; then
+        version=$(wget -qO- http://source.icu-project.org/repos/icu/icu/tags | sed -n 's,.*href="release-\([0-9]\+-[0-9]\+\)/".*,\1,p' | tail -1)
+        tag="release-${version}"
+    else
+        if [[ "$version" =~ ^[0-9.]+$ ]]; then
+            tag="release-${version}"
+        else
+            tag="$version"
+            version=${version##*[a-z]-}
+            if ! [[ "$version" =~ ^[0-9.]+$ ]]; then
+                version=$(date +'%Y-%m-%d')
+            fi
+        fi
+    fi
     source=http://source.icu-project.org/repos/icu/icu/tags/release-${version}
     svn co $source .
 else
-    version=$(date +'%Y-%m-%d')
+    version=${version:-$(date +'%Y-%m-%d')}
 fi
 version=${version//-/.}
 path=icu-${version}
