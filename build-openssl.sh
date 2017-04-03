@@ -52,7 +52,9 @@ if test $download -eq 1; then
     if test -n "$version"; then
         file=openssl-${version}.tar.gz
     else
-        file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-[0-9][^"]*\.tar\.gz\)".*,\1,p'  | head -1)
+        #file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-[0-9][^"]*\.tar\.gz\)".*,\1,p'  | head -1)
+        # use old version 1.0.x, because Qt < 5.10 cannot handle 1.1.x
+        file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-1.0.[0-9][^"]*\.tar\.gz\)".*,\1,p'  | head -1)
     fi
     path=${file%.tar.gz}
     wget -qO$file $source/$file
@@ -86,6 +88,8 @@ esac
 make
 make install
 cp *.dll ${WORKSPACE}/usr/lib/
+
+#sed -i '/#define HEADER_X509V3_H/a \\n#ifdef X509_NAME\n#undef X509_NAME\n#endif'${WORKSPACE}/usr/include/openssl/x509v3.h
 
 cd ${WORKSPACE}
 zip -r ${path}~windows.${BUILD_NUMBER}_${ARCH}.zip usr

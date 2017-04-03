@@ -48,56 +48,40 @@ set -x
 
 cd ${WORKSPACE}
 if test $download -eq 1; then
+    git clone https://code.qt.io/qt/qt5.git .
     if test -z "$version"; then
-        version=$(wget -qO- http://source.icu-project.org/repos/icu/icu/tags | sed -n 's,.*href="release-\([0-9]\+-[0-9]\+\)/".*,\1,p' | tail -1)
-        # bugfix: 58-1 does not compile
-        if test "$version" = "58-1"; then
-            version="57-1"
-        fi
-        tag="release-${version}"
-    else
-        if [[ "$version" =~ ^[0-9.]+$ ]]; then
-            tag="release-${version}"
-        else
-            tag="$version"
-            version=${version##*[a-z]-}
-            if ! [[ "$version" =~ ^[0-9.]+$ ]]; then
-                version=$(date +'%Y-%m-%d')
-            fi
-        fi
+        version=$(git branch -r | sed -n 's,^ *origin/\([0-9.]\+\)$,\1,p' | tail -1)
     fi
-    source=http://source.icu-project.org/repos/icu/icu/tags/release-${version}
-    svn co $source .
-else
-    version=${version:-$(date +'%Y-%m-%d')}
+    git checkout "$version"
+    perl init-repository
 fi
-version=${version//-/.}
-path=icu-${version}
+if test -z "$version"; then
+    version=$(git branch | sed -n 's,^\* *,,p')
+fi
+path=qt-${version}
 [[ "$version" =~ ^[0-9.]+$ ]]
 
 echo "Version: $version"
 echo "Package: $path"
 
-case ${MINGW} in
-    (*i?86*)
-        TARGET=mingw
-        ;;
-    (*x86_64*)
-        TARGET=mingw64
-        ;;
-    (*) false;;
-esac
+git submodule foreach --recursive "git clean -dfx"
 
-test -d ${WORKSPACE}/build-lin || mkdir ${WORKSPACE}/build-lin
-cd ${WORKSPACE}/build-lin
-../source/configure
-make
-test -d ${WORKSPACE}/build-win || mkdir ${WORKSPACE}/build-win
-cd ${WORKSPACE}/build-win
-../source/configure \
-    --host=${MINGW} \
-    --with-cross-build=${WORKSPACE}/build-lin \
-    --prefix=${WORKSPACE}/usr
+# bugfixes:
+#   MinGW has no uiviewsettingsinterop.h
+sed -i '/^ *# *define *HAS_UI_VIEW_SETTINGS_INTEROP *$/d' qtbase/src/plugins/platforms/windows/qwin10helpers.cpp
+
+./configure -v -recheck-all -opensource -confirm-license \
+    -xplatform win32-g++ -device-option CROSS_COMPILE=${MINGW}- \
+    -no-compile-examples \
+    -I$(pwd)/usr/include \
+    -L$(pwd)/usr/lib \
+    -prefix $(pwd)/usr \
+    -system-proxies \
+    -no-opengl \
+    -openssl-runtime \
+    -shared \
+    -release
+
 make
 make install
 
