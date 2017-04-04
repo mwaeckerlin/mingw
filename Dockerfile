@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y mingw-w64 perl python make zip subversi
 
 ADD build-openssl.sh /build-openssl.sh
 ADD build-icu.sh /build-icu.sh
+ADD build-qt.sh /build-qt.sh
 
 WORKDIR /workdir
 ENTRYPOINT ["/bin/bash"]
