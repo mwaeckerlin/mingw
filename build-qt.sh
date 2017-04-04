@@ -77,10 +77,6 @@ sed -i '/option(host_build)/d' qtactiveqt/src/tools/idc/idc.pro
 # qwinjumplist.cpp:404:106: error: ‘SHCreateItemFromParsingName’ was not declared in this scope
 sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' qtwinextras/src/winextras/qwinjumplist.cpp
 
-# /workdir/qtlocation/src/location
-# ./.obj/release/qgeotiledmapscene.o:qgeotiledmapscene.cpp:(.text+0x3f53): undefined reference to `__imp__ZN19QSGDefaultImageNode18setAnisotropyLevelEN10QSGTexture15AnisotropyLevelE
-# → requires OpenGL
-
 # in qtexttospeech_sapi.cpp file sphelper.h is missing → "-skip qtspeech"
 ./configure -v -recheck-all -opensource -confirm-license \
     -xplatform win32-g++ -device-option CROSS_COMPILE=${MINGW}- \

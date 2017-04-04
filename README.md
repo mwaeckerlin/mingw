@@ -22,9 +22,42 @@ Build ICU version 57-1 in the current working directory:
 
 ## Qt5
 
-`/build-qt.sh -d`
+- Script: `/build-qt.sh -d`
+- Requires: `/build-openssl.sh`, `build-icu.sh`
 
-Configuration:
+### Build Into Directory
+
+e.g.:
+```
+mkdir -p /tmp/build/usr
+cd /tmp/build
+docker pull mwaeckerlin/mingw
+docker run -it --rm -v $(pwd)/usr:/workdir/usr -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
+docker run -it --rm -v $(pwd)/usr:/workdir/usr -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d
+docker run -it --rm -v $(pwd)/usr:/workdir/usr -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
+```
+
+Now you find everything in subdir `usr` and the build directory remains clean.
+
+### Keep the Build Data
+
+To keep all the build data, just mount the whole build directory into the docker instance:
+```
+mkdir -p /tmp/fullbuild
+docker pull mwaeckerlin/mingw
+docker run -it --rm -v /tmp/fullbuild:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
+docker run -it --rm -v /tmp/fullbuild:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d
+docker run -it --rm -v /tmp/fullbuild:/workdir -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
+```
+
+Now in `/tmp/fullbuild` you find:
+- `usr` with an installation of all the build targets
+- `openssl-1.0.2k~windows.0_x86_64.zip` the OpenSSL library for windows (or another version number)
+- `icu-57.1~windows.0_x86_64.zip` the ICU library for windows (or another version number)
+- `` the QT library for windows (or another version number)
+- the sources and build files
+
+### Configuration:
 
 ```Configure summary:
 

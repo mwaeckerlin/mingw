@@ -67,7 +67,8 @@ if test $download -eq 1; then
         fi
     fi
     source=http://source.icu-project.org/repos/icu/icu/tags/release-${version}
-    svn co $source .
+    svn co $source icu-${version}
+    cd icu-${version}
 else
     version=${version:-$(date +'%Y-%m-%d')}
 fi
@@ -88,15 +89,15 @@ case ${MINGW} in
     (*) false;;
 esac
 
-test -d ${WORKSPACE}/build-lin || mkdir ${WORKSPACE}/build-lin
-cd ${WORKSPACE}/build-lin
+test -d build-lin || mkdir build-lin
+test -d build-win || mkdir build-win
+cd build-lin
 ../source/configure
 make
-test -d ${WORKSPACE}/build-win || mkdir ${WORKSPACE}/build-win
-cd ${WORKSPACE}/build-win
+cd ../build-win
 ../source/configure \
     --host=${MINGW} \
-    --with-cross-build=${WORKSPACE}/build-lin \
+    --with-cross-build=$(pwd)/../build-lin \
     --prefix=${WORKSPACE}/usr
 make
 make install
