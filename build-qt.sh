@@ -48,7 +48,8 @@ set -x
 
 cd ${WORKSPACE}
 if test $download -eq 1; then
-    git clone https://code.qt.io/qt/qt5.git .
+    git clone https://code.qt.io/qt/qt5.git qt5
+    cd qt5
     if test -z "$version"; then
         version=$(git branch -r | sed -n 's,^ *origin/\([0-9.]\+\)$,\1,p' | tail -1)
     fi
@@ -84,9 +85,9 @@ sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' q
 ./configure -v -recheck-all -opensource -confirm-license \
     -xplatform win32-g++ -device-option CROSS_COMPILE=${MINGW}- \
     -no-compile-examples \
-    -I$(pwd)/usr/include \
-    -L$(pwd)/usr/lib \
-    -prefix $(pwd)/usr \
+    -I${WORKSPACE}/usr/include \
+    -L${WORKSPACE}/usr/lib \
+    -prefix ${WORKSPACE}/usr \
     -system-proxies \
     -opengl desktop \
     -openssl-runtime \
