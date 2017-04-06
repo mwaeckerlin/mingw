@@ -3,7 +3,9 @@
 set -e
 
 MINGW=${MINGW:-x86_64-w64-mingw32}
+PREFIX=${PREFIX:-usr}
 WORKSPACE=${WORKSPACE:-$(pwd)}
+TARGET=${TARGET:-${WORKSPACE}}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
 
@@ -25,11 +27,13 @@ OPTIONS:
 VARIABLES:
 
   MINGW           mingw parameter (default: $MINGW)
+  PREFIX          relative installation prefix (default: $PREFIX)
   WORKSPACE       workspace path (default: $WORKSPACE)
+  TARGET          installation target (default: $TARGET)
   BUILD_NUMBER    build number (default: $BUILD_NUMBER)
   ARCH            architecture (default: $ARCH)
 
-Builds OpenSSL for Windows
+Builds ICU for Windows
 EOF
             exit
             ;;
@@ -79,16 +83,6 @@ path=icu-${version}
 echo "Version: $version"
 echo "Package: $path"
 
-case ${MINGW} in
-    (*i?86*)
-        TARGET=mingw
-        ;;
-    (*x86_64*)
-        TARGET=mingw64
-        ;;
-    (*) false;;
-esac
-
 test -d build-lin || mkdir build-lin
 test -d build-win || mkdir build-win
 cd build-lin
@@ -98,9 +92,9 @@ cd ../build-win
 ../source/configure \
     --host=${MINGW} \
     --with-cross-build=$(pwd)/../build-lin \
-    --prefix=${WORKSPACE}/usr
+    --prefix="${TARGET}/${PREFIX}"
 make
 make install
 
-cd ${WORKSPACE}
-zip -r ${path}~windows.${BUILD_NUMBER}_${ARCH}.zip usr
+cd "${TARGET}"
+zip -r "${path}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"

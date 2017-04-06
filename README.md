@@ -2,64 +2,81 @@
 
 Build Scripts for Cross Compiling Windows Targets in an Ubuntu Docker Container.
 
-See also: https://marc.wäckerlin.ch/computer/cross-compile-openssl-for-windows-on-linux
+See also: [my blog](https://marc.wäckerlin.ch/computer/cross-compile-openssl-for-windows-on-linux)
+
+## Build Scripts
 
 List all available build scripts:
 
     docker run -it –rm mwaeckerlin/mingw -c ‘ls /build-*.sh’
 
-Show options for building OpenSSL:
+Currently, there are:
+
+- Build [OpenSSL](https://www.openssl.org/): /build-openssl.sh
+- Build [ICU](http://site.icu-project.org/): /build-icu.sh
+- Build [Qt5](https://www.qt.io/): /build-qt.sh
+- Build [generic project](https://dev.marc.waeckerlin.org/redmine/projects): /build.sh
+
+Show options e.g. for building OpenSSL:
 
     docker run -it --rm mwaeckerlin/mingw /build-openssl.sh -h
+    
+## Build Generic Projects
+
+You can build any project, that is based on the [Bootstrap Build Environment](https://dev.marc.waeckerlin.org/redmine/projects/bootstrap-build-environment), i.e. my own projects:
+
+    mkdir -p /tmp/build
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/mrw-c++/trunk -n mrw-c++
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/libxml-cxx/trunk -n libxml-cxx
+
+Now you find a zip file per library, containing the installation that you find in subdir `/tmp/build/usr`. Subsequent builds also contain the depending libraries. If you don't want this behaviour, you can pass variables to docker build into different directories. For details, call e.g. `docker run [...] /build.sh --help`, then pass the variables for the build, e.g. specify a different target for the result, e.g. `docker run [...] -e PREFIX=otherdir mwaeckerlin/mingw /build.sh -s [...]`. Then you find the derieved objets in `otherdir`, and the zip file does not contain the depending libraries.
+
+Let's continue:
+
+The following requires OpenSSL:
+
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/libpcscxx/trunk -n libpcscxx --enable-pkcs11-download
+
+The following requires Qt:
+
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d -v 57-1
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/proxyface/trunk -n proxyface
+
+## Build OpenSSL
 
 Compile latest OpenSSL in the current working directory:
 
-    docker run -it --rm -v $(pwd):/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
+
+## Build ICU
 
 Build ICU version 57-1 in the current working directory:
 
-    docker run -it --rm -v $(pwd):/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d -v 57-1
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d -v 57-1
 
-## Qt5
+## Build Qt5
 
 - Script: `/build-qt.sh -d`
 - Requires: `/build-openssl.sh`, `build-icu.sh`
 
-### Build Into Directory
+    mkdir -p /tmp/build/usr
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
 
-e.g.:
-```
-mkdir -p /tmp/build/usr
-cd /tmp/build
-docker pull mwaeckerlin/mingw
-docker run -it --rm -v $(pwd)/usr:/workdir/usr -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
-docker run -it --rm -v $(pwd)/usr:/workdir/usr -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d
-docker run -it --rm -v $(pwd)/usr:/workdir/usr -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
-```
-
-Now you find everything in subdir `usr` and the build directory remains clean.
-
-### Keep the Build Data
-
-To keep all the build data, just mount the whole build directory into the docker instance:
-```
-mkdir -p /tmp/fullbuild
-docker pull mwaeckerlin/mingw
-docker run -it --rm -v /tmp/fullbuild:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
-docker run -it --rm -v /tmp/fullbuild:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d
-docker run -it --rm -v /tmp/fullbuild:/workdir -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
-```
-
-Now in `/tmp/fullbuild` you find:
+Now in `/tmp/build` you find:
 - `usr` with an installation of all the build targets
 - `openssl-1.0.2k~windows.0_x86_64.zip` the OpenSSL library for windows (or another version number)
 - `icu-57.1~windows.0_x86_64.zip` the ICU library for windows (or another version number)
-- `` the QT library for windows (or another version number)
+- `...` the QT library for windows (or another version number)
 - the sources and build files
 
-### Configuration:
+### Qt Configuration:
 
-```Configure summary:
+```
+Configure summary:
 
 Building on: linux-g++ (x86_64, CPU features: mmx sse sse2)
 Building for: win32-g++ (x86_64, CPU features: mmx sse sse2)

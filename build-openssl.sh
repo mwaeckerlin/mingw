@@ -3,7 +3,9 @@
 set -e
 
 MINGW=${MINGW:-x86_64-w64-mingw32}
+PREFIX=${PREFIX:-usr}
 WORKSPACE=${WORKSPACE:-$(pwd)}
+TARGET=${TARGET:-${WORKSPACE}}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
 
@@ -25,7 +27,9 @@ OPTIONS:
 VARIABLES:
 
   MINGW           mingw parameter (default: $MINGW)
+  PREFIX          relative installation prefix (default: $PREFIX)
   WORKSPACE       workspace path (default: $WORKSPACE)
+  TARGET          installation target (default: $TARGET)
   BUILD_NUMBER    build number (default: $BUILD_NUMBER)
   ARCH            architecture (default: $ARCH)
 
@@ -75,21 +79,19 @@ echo "Package: $path"
 
 case ${MINGW} in
     (*i?86*)
-        TARGET=mingw
+        TYPE=mingw
         ;;
     (*x86_64*)
-        TARGET=mingw64
+        TYPE=mingw64
         ;;
     (*) false;;
 esac
 
-./Configure ${TARGET} shared --cross-compile-prefix=${MINGW}- --prefix=${WORKSPACE}/usr
+./Configure ${TYPE} shared --cross-compile-prefix=${MINGW}- --prefix="${TARGET}/${PREFIX}"
 
 make
 make install
-cp *.dll ${WORKSPACE}/usr/lib/
+cp *.dll "${TARGET}/${PREFIX}/lib/"
 
-#sed -i '/#define HEADER_X509V3_H/a \\n#ifdef X509_NAME\n#undef X509_NAME\n#endif'${WORKSPACE}/usr/include/openssl/x509v3.h
-
-cd ${WORKSPACE}
-zip -r ${path}~windows.${BUILD_NUMBER}_${ARCH}.zip usr
+cd "${TARGET}"
+zip -r "${path}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"

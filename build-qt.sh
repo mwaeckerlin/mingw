@@ -3,7 +3,10 @@
 set -e
 
 MINGW=${MINGW:-x86_64-w64-mingw32}
+PREFIX=${PREFIX:-usr}
 WORKSPACE=${WORKSPACE:-$(pwd)}
+TARGET=${TARGET:-${WORKSPACE}}
+WINLIBS=${WINLIBS:-${TARGET}/${PREFIX}}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
 
@@ -25,11 +28,19 @@ OPTIONS:
 VARIABLES:
 
   MINGW           mingw parameter (default: $MINGW)
+  PREFIX          relative installation prefix (default: $PREFIX)
   WORKSPACE       workspace path (default: $WORKSPACE)
+  WINLIBS         path to windows libraries (default: $WINLIBS)
+  TARGET          installation target (default: $TARGET)
   BUILD_NUMBER    build number (default: $BUILD_NUMBER)
   ARCH            architecture (default: $ARCH)
 
-Builds OpenSSL for Windows
+DEPENDENCIES:
+
+  openssl        /build-openssl.sh
+  icu            /build-icu.sh
+
+Builds QT for Windows
 EOF
             exit
             ;;
@@ -81,9 +92,9 @@ sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' q
 ./configure -v -recheck-all -opensource -confirm-license \
     -xplatform win32-g++ -device-option CROSS_COMPILE=${MINGW}- \
     -no-compile-examples \
-    -I${WORKSPACE}/usr/include \
-    -L${WORKSPACE}/usr/lib \
-    -prefix ${WORKSPACE}/usr \
+    -I"${WINLIBS}/include" \
+    -L"${WINLIBS}/lib" \
+    -prefix "${TARGET}/${PREFIX}" \
     -system-proxies \
     -opengl desktop \
     -openssl-runtime \
@@ -94,5 +105,5 @@ sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' q
 make
 make install
 
-cd ${WORKSPACE}
-zip -r ${path}~windows.${BUILD_NUMBER}_${ARCH}.zip usr
+cd "${TARGET}"
+zip -r "${path}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
