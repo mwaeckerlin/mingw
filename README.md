@@ -8,7 +8,7 @@ See also: [my blog](https://marc.wäckerlin.ch/computer/cross-compile-openssl-fo
 
 List all available build scripts:
 
-    docker run -it –rm mwaeckerlin/mingw -c ‘ls /build-*.sh’
+    docker run -it --rm mwaeckerlin/mingw -c ‘ls /build-*.sh’
 
 Currently, there are:
 
@@ -31,18 +31,16 @@ You can build any project, that is based on the [Bootstrap Build Environment](ht
 
 Now you find a zip file per library, containing the installation that you find in subdir `/tmp/build/usr`. Subsequent builds also contain the depending libraries. If you don't want this behaviour, you can pass variables to docker build into different directories. For details, call e.g. `docker run [...] /build.sh --help`, then pass the variables for the build, e.g. specify a different target for the result, e.g. `docker run [...] -e PREFIX=otherdir mwaeckerlin/mingw /build.sh -s [...]`. Then you find the derieved objets in `otherdir`, and the zip file does not contain the depending libraries.
 
-Let's continue:
-
-The following requires OpenSSL:
+Qt requires OpenSSL and ICU:
 
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
-    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/libpcscxx/trunk -n libpcscxx --enable-pkcs11-download
-
-The following requires Qt:
-
-    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d -v 57-1
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
+
+The projects proxyface and libpcscxx require Qt, so build them after the lines above:
+
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/proxyface/trunk -n proxyface
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/libpcscxx/trunk -n libpcscxx --enable-pkcs11-download
 
 ## Build OpenSSL
 

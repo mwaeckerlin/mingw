@@ -105,5 +105,12 @@ sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' q
 make
 make install
 
+# bugfixes:
+#  Qt pkg-config files link to debug version in release build
+#  https://bugreports.qt.io/browse/QTBUG-60028
+for f in "${TARGET}/${PREFIX}"/lib/pkgconfig*.pc; do
+    sed -i 's,\(-lQt5[-_a-zA-Z0-9]*\)d,\1,g' "$f"
+done
+
 cd "${TARGET}"
 zip -r "${path}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
