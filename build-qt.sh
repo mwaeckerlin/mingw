@@ -108,7 +108,7 @@ make install
 # bugfixes:
 #  Qt pkg-config files link to debug version in release build
 #  https://bugreports.qt.io/browse/QTBUG-60028
-for f in "${TARGET}/${PREFIX}"/lib/pkgconfig*.pc; do
+for f in "${TARGET}/${PREFIX}"/lib/pkgconfig/*.pc; do
     sed -i 's,\(-lQt5[-_a-zA-Z0-9]*\)d,\1,g' "$f"
 done
 
