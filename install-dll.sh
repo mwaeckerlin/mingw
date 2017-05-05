@@ -49,7 +49,7 @@ done
 set -x
 
 test -d ${WINLIBS}/lib || mkdir -p ${WINLIBS}/lib
-cp $(dpkg -S *.dll | sed -n 's,.*-'"${ARCH//_/-}"': ,,p') ${WINLIBS}/lib/
+cp $(dpkg -S *.dll | sed -n 's,.*-'"${ARCH//_/-}"'.*: ,,p')  ${WINLIBS}/lib/
 
 cd "${WORKSPACE}"
 zip -r "${name}-${version}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
