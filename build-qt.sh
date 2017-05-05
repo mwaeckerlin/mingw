@@ -16,7 +16,7 @@ while test $# -gt 0; do
     case "$1" in
         (-h|--help)
             cat<<EOF
-$0 [OPTIONS]
+$0 [OPTIONS] [CONFIGURE-ARGUMENTS]
 
 OPTIONS:
 
@@ -24,6 +24,10 @@ OPTIONS:
   -v, --version   specify version string
   -d, --download  download sources
                   otherwise sources must be in $(pwd)
+
+CONFIGURE-ARGUMENTS:
+
+Arguments that are passed to configure.  
 
 VARIABLES:
 
@@ -46,7 +50,7 @@ EOF
             ;;
         (-d|--download) download=1;;
         (-v|--version) shift; version="$1";;
-        (*) echo "ERROR: unknown option: $1" 1>&2; exit 1;;
+        (*) break;;
     esac
     if ! test $# -gt 0; then
         echo "ERROR: missing parameter" 1>&2
@@ -100,7 +104,8 @@ sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' q
     -openssl-runtime \
     -skip qtspeech \
     -shared \
-    -release
+    -release \
+    $*
 
 make
 make install
