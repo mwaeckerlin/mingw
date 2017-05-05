@@ -20,6 +20,12 @@ Currently, there are:
 Show options e.g. for building OpenSSL:
 
     docker run -it --rm mwaeckerlin/mingw /build-openssl.sh -h
+
+## Add Required DLLs
+
+Some MinGW DLLs are required for running the builds on Windows. Install them into the installation directory using the script `install-dll.sh`:
+
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /install-dll.sh
     
 ## Build Generic Projects
 
