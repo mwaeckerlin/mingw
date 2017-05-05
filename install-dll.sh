@@ -6,9 +6,10 @@ MINGW=${MINGW:-x86_64-w64-mingw32}
 PREFIX=${PREFIX:-usr}
 WORKSPACE=${WORKSPACE:-$(pwd)}
 TARGET=${TARGET:-${WORKSPACE}}
-WINLIBS=${WINLIBS:-${TARGET}/${PREFIX}}
+WINREQ=${WINREQ:-${TARGET}/${PREFIX}}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
+WINLIB=${WINLIB:-${WINREQ}/exe}
 
 while test $# -gt 0; do
     case "$1" in
@@ -25,12 +26,13 @@ VARIABLES:
   MINGW              mingw parameter (default: $MINGW)
   PREFIX             relative installation prefix (default: $PREFIX)
   WORKSPACE          workspace path (default: $WORKSPACE)
-  WINLIBS            path to windows libraries (default: $WINLIBS)
+  WINREQ             path to windows libraries (default: $WINREQ)
   TARGET             installation target (default: $TARGET)
   BUILD_NUMBER       build number (default: $BUILD_NUMBER)
   ARCH               architecture (default: $ARCH)
+  WINLIB             path to required windows libraries (default: $WINLIB)
 
-Copies required DLLs to ${WINLIBS}/lib
+Copies required DLLs to ${WINLIB}
 EOF
             exit
             ;;
@@ -48,8 +50,8 @@ done
 
 set -x
 
-test -d ${WINLIBS}/lib || mkdir -p ${WINLIBS}/lib
-cp $(dpkg -S *.dll | sed -n 's,.*-'"${ARCH//_/-}"'.*: ,,p')  ${WINLIBS}/lib/
+test -d ${WINLIB} || mkdir -p ${WINLIB}
+cp $(dpkg -S *.dll | sed -n 's,.*-'"${ARCH//_/-}"'.*: ,,p')  ${WINLIB}/
 
 cd "${WORKSPACE}"
 zip -r "${name}-${version}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"

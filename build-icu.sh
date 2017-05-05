@@ -8,6 +8,8 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 TARGET=${TARGET:-${WORKSPACE}}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
+BINDIR=${BINDIR:-${PREFIX}/exe}
+LIBDIR=${LIBDIR:-${PREFIX}/exe}
 
 version=
 download=0
@@ -19,19 +21,21 @@ $0 [OPTIONS]
 
 OPTIONS:
 
-  -h, --help      show this help
-  -v, --version   specify version string
-  -d, --download  download sources
-                  otherwise sources must be in $(pwd)
+  -h, --help         show this help
+  -v, --version      specify version string
+  -d, --download     download sources
+                     otherwise sources must be in $(pwd)
 
 VARIABLES:
 
-  MINGW           mingw parameter (default: $MINGW)
-  PREFIX          relative installation prefix (default: $PREFIX)
-  WORKSPACE       workspace path (default: $WORKSPACE)
-  TARGET          installation target (default: $TARGET)
-  BUILD_NUMBER    build number (default: $BUILD_NUMBER)
-  ARCH            architecture (default: $ARCH)
+  MINGW              mingw parameter (default: $MINGW)
+  PREFIX             relative installation prefix (default: $PREFIX)
+  WORKSPACE          workspace path (default: $WORKSPACE)
+  TARGET             installation target (default: $TARGET)
+  BUILD_NUMBER       build number (default: $BUILD_NUMBER)
+  ARCH               architecture (default: $ARCH)
+  BINDIR             install dir for exe files (default: $BINDIR)
+  LIBDIR             install dir for dll files (default: $LIBDIR)
 
 Builds ICU for Windows
 EOF
@@ -92,7 +96,11 @@ cd ../build-win
 ../source/configure \
     --host=${MINGW} \
     --with-cross-build=$(pwd)/../build-lin \
-    --prefix="${TARGET}/${PREFIX}"
+    --prefix="${TARGET}/${PREFIX}" \
+    --bindir="${TARGET}/$BINDIR" \
+    --sbindir="${TARGET}/$BINDIR" \
+    --libdir="${TARGET}/$LIBDIR" \
+    --libexecdir="${TARGET}/$LIBDIR"
 make
 make install
 

@@ -6,9 +6,13 @@ MINGW=${MINGW:-x86_64-w64-mingw32}
 PREFIX=${PREFIX:-usr}
 WORKSPACE=${WORKSPACE:-$(pwd)}
 TARGET=${TARGET:-${WORKSPACE}}
-WINLIBS=${WINLIBS:-${TARGET}/${PREFIX}}
+WINREQ=${WINREQ:-${TARGET}/${PREFIX}}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
+BINDIR=${BINDIR:-${PREFIX}/exe}
+LIBDIR=${LIBDIR:-${PREFIX}/exe}
+WININC=${WININC:-${WINREQ}/include}
+WINLIB=${WINLIB:-${WINREQ}/exe}
 
 name=
 svn=
@@ -37,10 +41,14 @@ VARIABLES:
   MINGW              mingw parameter (default: $MINGW)
   PREFIX             relative installation prefix (default: $PREFIX)
   WORKSPACE          workspace path (default: $WORKSPACE)
-  WINLIBS            path to windows libraries (default: $WINLIBS)
+  WINREQ             path to required windows libraries (default: $WINREQ)
   TARGET             installation target (default: $TARGET)
   BUILD_NUMBER       build number (default: $BUILD_NUMBER)
   ARCH               architecture (default: $ARCH)
+  BINDIR             install dir for exe files (default: $BINDIR)
+  LIBDIR             install dir for dll files (default: $LIBDIR)
+  WININC             path to required windows include files (default: $WININC)
+  WINLIB             path to required windows libraries (default: $WINLIB)
 
 Builds Standard Autoconf Projects for Windows
 EOF
@@ -74,9 +82,13 @@ fi
 ./bootstrap.sh -c \
     --host=${MINGW} \
     --prefix="${TARGET}/${PREFIX}" \
-    CPPFLAGS="-I${WINLIBS}/include" \
-    LDFLAGS="-L${WINLIBS}/lib" \
-    PKG_CONFIG_PATH="${WINLIBS}/lib/pkgconfig" \
+    --bindir="${TARGET}/$BINDIR" \
+    --sbindir="${TARGET}/$BINDIR" \
+    --libdir="${TARGET}/$LIBDIR" \
+    --libexecdir="${TARGET}/$LIBDIR" \
+    CPPFLAGS="-I${WININC}" \
+    LDFLAGS="-L${WINLIB}" \
+    PKG_CONFIG_PATH="${WINLIB}/pkgconfig" \
     $*
 
 if test -z "$name" -o "$name" = "."; then

@@ -6,9 +6,13 @@ MINGW=${MINGW:-x86_64-w64-mingw32}
 PREFIX=${PREFIX:-usr}
 WORKSPACE=${WORKSPACE:-$(pwd)}
 TARGET=${TARGET:-${WORKSPACE}}
-WINLIBS=${WINLIBS:-${TARGET}/${PREFIX}}
+WINREQ=${WINREQ:-${TARGET}/${PREFIX}}
 BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
+BINDIR=${BINDIR:-${PREFIX}/exe}
+LIBDIR=${LIBDIR:-${PREFIX}/exe}
+WININC=${WININC:-${WINREQ}/include}
+WINLIB=${WINLIB:-${WINREQ}/exe}
 
 version=
 download=0
@@ -20,10 +24,10 @@ $0 [OPTIONS] [CONFIGURE-ARGUMENTS]
 
 OPTIONS:
 
-  -h, --help      show this help
-  -v, --version   specify version string
-  -d, --download  download sources
-                  otherwise sources must be in $(pwd)
+  -h, --help         show this help
+  -v, --version      specify version string
+  -d, --download     download sources
+                     otherwise sources must be in $(pwd)
 
 CONFIGURE-ARGUMENTS:
 
@@ -31,13 +35,17 @@ Arguments that are passed to configure.
 
 VARIABLES:
 
-  MINGW           mingw parameter (default: $MINGW)
-  PREFIX          relative installation prefix (default: $PREFIX)
-  WORKSPACE       workspace path (default: $WORKSPACE)
-  WINLIBS         path to windows libraries (default: $WINLIBS)
-  TARGET          installation target (default: $TARGET)
-  BUILD_NUMBER    build number (default: $BUILD_NUMBER)
-  ARCH            architecture (default: $ARCH)
+  MINGW              mingw parameter (default: $MINGW)
+  PREFIX             relative installation prefix (default: $PREFIX)
+  WORKSPACE          workspace path (default: $WORKSPACE)
+  WINREQ             path to required windows libraries (default: $WINREQ)
+  TARGET             installation target (default: $TARGET)
+  BUILD_NUMBER       build number (default: $BUILD_NUMBER)
+  ARCH               architecture (default: $ARCH)
+  BINDIR             install dir for exe files (default: $BINDIR)
+  LIBDIR             install dir for dll files (default: $LIBDIR)
+  WININC             path to required windows include files (default: $WININC)
+  WINLIB             path to required windows libraries (default: $WINLIB)
 
 DEPENDENCIES:
 
@@ -96,9 +104,12 @@ sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' q
 ./configure -v -recheck-all -opensource -confirm-license \
     -xplatform win32-g++ -device-option CROSS_COMPILE=${MINGW}- \
     -no-compile-examples \
-    -I"${WINLIBS}/include" \
-    -L"${WINLIBS}/lib" \
+    -I"${WININC}" \
+    -L"${WINLIB}" \
     -prefix "${TARGET}/${PREFIX}" \
+    -bindir="${TARGET}/$BINDIR" \
+    -libdir="${TARGET}/$LIBDIR" \
+    -libexecdir="${TARGET}/$LIBDIR" \
     -system-proxies \
     -opengl desktop \
     -openssl-runtime \
