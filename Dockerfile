@@ -13,6 +13,7 @@ ADD build-openssl.sh /build-openssl.sh
 ADD build-icu.sh /build-icu.sh
 ADD build-qt.sh /build-qt.sh
 ADD build.sh /build.sh
+ADD install-dll.sh /install-dll.sh
 
 WORKDIR /workdir
 RUN chmod ugo+wrx /workdir
