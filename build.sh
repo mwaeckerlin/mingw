@@ -2,7 +2,7 @@
 
 set -e
 
-MINGW=${MINGW:-x86_64-w64-mingw32}
+MINGW=${MINGW:-${ARCH:-x86_64}-w64-mingw32}
 PREFIX=${PREFIX:-usr}
 WORKSPACE=${WORKSPACE:-$(pwd)}
 TARGET=${TARGET:-${WORKSPACE}}

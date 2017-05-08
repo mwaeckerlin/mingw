@@ -2,7 +2,7 @@
 
 set -e
 
-MINGW=${MINGW:-x86_64-w64-mingw32}
+MINGW=${MINGW:-${ARCH:-x86_64}-w64-mingw32}
 PREFIX=${PREFIX:-usr}
 WORKSPACE=${WORKSPACE:-$(pwd)}
 TARGET=${TARGET:-${WORKSPACE}}
@@ -94,10 +94,8 @@ esac
 ./Configure ${TYPE} shared \
     --cross-compile-prefix=${MINGW}- \
     --prefix="${TARGET}/${PREFIX}" \
-    --bindir="${TARGET}/$BINDIR" \
-    --sbindir="${TARGET}/$BINDIR" \
-    --libdir="${TARGET}/$LIBDIR" \
-    --libexecdir="${TARGET}/$LIBDIR"
+    --openssldir="${TARGET}/$BINDIR" \
+    --libdir="${TARGET}/$LIBDIR"
 
 make
 make install

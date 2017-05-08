@@ -26,6 +26,21 @@ Show options e.g. for building OpenSSL:
 Some MinGW DLLs are required for running the builds on Windows. Install them into the installation directory using the script `install-dll.sh`:
 
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /install-dll.sh
+
+## Environment Variables
+
+ - `MINGW`              mingw parameter (default: detect from `ARCH` or `x86_64-w64-mingw32`)
+ - `PREFIX`             relative installation prefix (default: `usr`)
+ - `WORKSPACE`          workspace path (default: `/workdir`)
+ - `TARGET`             installation target (default: `WORKSPACE`)
+ - `WINREQ`             path to required windows libraries (default: `TARGET/PREFIX`)
+ - `BUILD_NUMBER`       build number (default: `0`)
+ - `ARCH`               architecture (default: from `MINGW`, which defaults to `x86_64`)
+ - `BINDIR`             install dir for exe files (default: `PREFIX/exe`)
+ - `LIBDIR`             install dir for dll files (default: `PREFIX/exe`)
+ - `WININC`             path to required windows include files (default: `WINREQ/include`)
+ - `WINLIB`             path to required windows libraries (default: `WINREQ/exe`)
+
     
 ## Build Generic Projects
 
