@@ -77,6 +77,11 @@ if test $download -eq 1; then
     source=http://source.icu-project.org/repos/icu/icu/tags/release-${version}
     svn co $source icu-${version}
     cd icu-${version}
+elif test -n "${version}" -a -d icu-${version}; then
+    cd icu-${version}
+elif test -z "${version}" -a -d icu-*; then
+    version=$(ls -d icu-* | sed 's,icu-,,')
+    cd icu-${version}
 else
     version=${version:-$(date +'%Y-%m-%d')}
 fi

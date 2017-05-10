@@ -68,14 +68,13 @@ if test $download -eq 1; then
     wget -qO$file $source/$file
     tar xf $file
     cd $path
+elif test -n "$version"; then
+    path=openssl-${version}
+    cd $path
 else
-    if test -n "$version"; then
-        path=openssl-${version}
-    else
-        path=$(pwd | sed 's,.*/,,')
-    fi
+    path=$(pwd | sed 's,.*/,,')
+    version=${version:-${path#openssl-}}
 fi
-version=${version:-${path#openssl-}}
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+[a-z]$ ]] && [ "$path" = "openssl-${version}" ]
 
 echo "Version: $version"
@@ -94,13 +93,15 @@ esac
 ./Configure ${TYPE} shared \
     --cross-compile-prefix=${MINGW}- \
     --prefix="${TARGET}/${PREFIX}" \
-    --openssldir="${TARGET}/$BINDIR" \
-    --libdir="${TARGET}/$LIBDIR"
+    --libdir="${LIBDIR#${PREFIX%/}/}"
+
+# option --bindir is not supported ba OpenSSL, so hard code it
+for f in $(grep -rl '$(INSTALL_PREFIX)$(INSTALLTOP)/bin'); do
+    sed -i 's,\(\$(INSTALL_PREFIX)\$(INSTALLTOP)/\)bin,\1'"${BINDIR#${PREFIX%/}/}"',g' "$f"
+done
 
 make
 make install
-test -d "$LIBDIR" || mkdir -p "$LIBDIR"
-cp *.dll "$LIBDIR/"
 
 cd "${TARGET}"
 zip -r "${path}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"

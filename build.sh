@@ -54,8 +54,20 @@ Builds Standard Autoconf Projects for Windows
 EOF
             exit
             ;;
-        (-s|--svn) shift; svn="$1";;
-        (-g|--git) shift; git="$1";;
+        (-s|--svn)
+            shift
+            svn="$1"
+            if test -z "$name"; then
+                name=$(sed 's,/\(trunk\|tags/.*\|branches/.*\),,;s,.*/,,' <<<$svn)
+            fi
+            ;;
+        (-g|--git)
+            shift
+            git="$1"
+            if test -z "$name"; then
+                name=$(sed 's,/\.git,,;s,.*/,,' <<<$git)
+            fi
+            ;;
         (-n|--name) shift; name="$1";;
         (*) break;;
     esac

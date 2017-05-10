@@ -11,6 +11,7 @@ BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
 BINDIR=${BINDIR:-${PREFIX}/exe}
 LIBDIR=${LIBDIR:-${PREFIX}/exe}
+PLUGINDIR=${PLUGINDIR:-${PREFIX}/exe}
 WININC=${WININC:-${WINREQ}/include}
 WINLIB=${WINLIB:-${WINREQ}/exe}
 
@@ -44,6 +45,7 @@ VARIABLES:
   ARCH               architecture (default: $ARCH)
   BINDIR             install dir for exe files (default: $BINDIR)
   LIBDIR             install dir for dll files (default: $LIBDIR)
+  PLUGINDIR          install dir for qt plugins (default: $PLUGINDIR)
   WININC             path to required windows include files (default: $WININC)
   WINLIB             path to required windows libraries (default: $WINLIB)
 
@@ -78,6 +80,8 @@ if test $download -eq 1; then
     fi
     git checkout "$version"
     perl init-repository
+elif test -d qt5; then
+    cd qt5
 fi
 if test -z "$version"; then
     version=$(git branch | sed -n 's,^\* *,,p')
@@ -107,13 +111,15 @@ sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' q
     -I"${WININC}" \
     -L"${WINLIB}" \
     -prefix "${TARGET}/${PREFIX}" \
-    -bindir="${TARGET}/$BINDIR" \
-    -libdir="${TARGET}/$LIBDIR" \
-    -libexecdir="${TARGET}/$LIBDIR" \
+    -bindir "${TARGET}/$BINDIR" \
+    -libdir "${TARGET}/$LIBDIR" \
+    -plugindir "${TARGET}/$PLUGINDIR" \
+    -libexecdir "${TARGET}/$LIBDIR" \
     -system-proxies \
     -opengl desktop \
     -openssl-runtime \
     -skip qtspeech \
+    -skip qtlocation \
     -shared \
     -release \
     $*
@@ -124,7 +130,7 @@ make install
 # bugfixes:
 #  Qt pkg-config files link to debug version in release build
 #  https://bugreports.qt.io/browse/QTBUG-60028
-for f in "${TARGET}/${PREFIX}"/lib/pkgconfig/*.pc; do
+for f in "${TARGET}/${LIBDIR}"/pkgconfig/*.pc; do
     sed -i 's,\(-lQt5[-_a-zA-Z0-9]*\)d,\1,g' "$f"
 done
 
