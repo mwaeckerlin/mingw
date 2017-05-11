@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     pandoc lsb-release doxygen graphviz mscgen \
     default-jre-headless \
     make subversion g++ git \
-    qtbase5-dev-tools
+    qtbase5-dev-tools qt5-default
 
 ADD build-openssl.sh /build-openssl.sh
 ADD build-icu.sh /build-icu.sh
