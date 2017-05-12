@@ -13,6 +13,7 @@ LIBDIR=${LIBDIR:-${PREFIX}/exe}
 
 version=
 download=0
+zip=0
 while test $# -gt 0; do
     case "$1" in
         (-h|--help)
@@ -22,6 +23,7 @@ $0 [OPTIONS]
 OPTIONS:
 
   -h, --help         show this help
+  -z, --zip          create zip package
   -v, --version      specify version string
   -d, --download     download sources
                      otherwise sources must be in $(pwd)
@@ -43,6 +45,7 @@ EOF
             ;;
         (-d|--download) download=1;;
         (-v|--version) shift; version="$1";;
+        (-z|--zip) zip=1;;
         (*) echo "ERROR: unknown option: $1" 1>&2; exit 1;;
     esac
     if ! test $# -gt 0; then
@@ -109,5 +112,7 @@ cd ../build-win
 make
 make install
 
-cd "${TARGET}"
-zip -r "${path}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
+if test $zip -eq 1; then
+    cd "${TARGET}"
+    zip -r "${path}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
+fi

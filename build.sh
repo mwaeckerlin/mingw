@@ -17,6 +17,7 @@ WINLIB=${WINLIB:-${WINREQ}/exe}
 name=
 svn=
 git=
+zip=0
 while test $# -gt 0; do
     case "$1" in
         (-h|--help)
@@ -26,6 +27,7 @@ $0 [OPTIONS] [CONFIGURE-ARGUMENTS]
 OPTIONS:
 
   -h, --help         show this help
+  -z, --zip          create zip package
   -s, --svn [src]    specify subversion source
   -g, --git [src]    specify git source
   -n, --name [name]  project name
@@ -69,6 +71,7 @@ EOF
             fi
             ;;
         (-n|--name) shift; name="$1";;
+        (-z|--zip) zip=1;;
         (*) break;;
     esac
     if ! test $# -gt 0; then
@@ -117,5 +120,7 @@ set -x
 make
 make install
 
-cd "${WORKSPACE}"
-zip -r "${name}-${version}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
+if test $zip -eq 1; then
+    cd "${TARGET}"
+    zip -r "${name}-${version}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
+fi

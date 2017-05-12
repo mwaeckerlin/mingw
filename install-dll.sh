@@ -11,6 +11,7 @@ BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
 WINLIB=${WINLIB:-${WINREQ}/exe}
 
+zip=0
 while test $# -gt 0; do
     case "$1" in
         (-h|--help)
@@ -20,6 +21,7 @@ $0 [OPTIONS]
 OPTIONS:
 
   -h, --help         show this help
+  -z, --zip          create zip package
 
 VARIABLES:
 
@@ -36,9 +38,7 @@ Copies required DLLs to ${WINLIB}
 EOF
             exit
             ;;
-        (-s|--svn) shift; svn="$1";;
-        (-g|--git) shift; git="$1";;
-        (-n|--name) shift; name="$1";;
+        (-z|--zip) zip=1;;
         (*) break;;
     esac
     if ! test $# -gt 0; then
@@ -53,5 +53,7 @@ set -x
 test -d ${WINLIB} || mkdir -p ${WINLIB}
 cp $(dpkg -S *.dll | sed -n 's,.*-'"${ARCH//_/-}"'.*: ,,p')  ${WINLIB}/
 
-cd "${WORKSPACE}"
-zip -r "${name}-${version}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
+if test $zip -eq 1; then
+    cd "${TARGET}"
+    zip -r "${name}-${version}~windows.${BUILD_NUMBER}_${ARCH}.zip" "${PREFIX}"
+fi

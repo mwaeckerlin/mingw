@@ -47,10 +47,10 @@ Some MinGW DLLs are required for running the builds on Windows. Install them int
 You can build any project, that is based on the [Bootstrap Build Environment](https://dev.marc.waeckerlin.org/redmine/projects/bootstrap-build-environment), i.e. my own projects:
 
     mkdir -p /tmp/build
-    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/mrw-c++/trunk -n mrw-c++
-    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/libxml-cxx/trunk -n libxml-cxx
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/mrw-c++/trunk -n mrw-c++ -z
+    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/libxml-cxx/trunk -n libxml-cxx -z
 
-Now you find a zip file per library, containing the installation that you find in subdir `/tmp/build/usr`. Subsequent builds also contain the depending libraries. If you don't want this behaviour, you can pass variables to docker build into different directories. For details, call e.g. `docker run [...] /build.sh --help`, then pass the variables for the build, e.g. specify a different target for the result, e.g. `docker run [...] -e PREFIX=otherdir mwaeckerlin/mingw /build.sh -s [...]`. Then you find the derieved objets in `otherdir`, and the zip file does not contain the depending libraries.
+Now you find a zip file per library, containing the installation that you find in subdir `/tmp/build/usr`. If you don't need the zip file, just the subdir, then omit option `-z`. Subsequent builds also contain the depending libraries. If you don't want this behaviour, you can pass variables to docker build into different directories. For details, call e.g. `docker run [...] /build.sh --help`, then pass the variables for the build, e.g. specify a different target for the result, e.g. `docker run [...] -e PREFIX=otherdir mwaeckerlin/mingw /build.sh -s [...]`. Then you find the derieved objets in `otherdir`, and the zip file does not contain the depending libraries.
 
 Qt requires OpenSSL and ICU:
 
