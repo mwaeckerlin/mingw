@@ -51,7 +51,7 @@ done
 set -x
 
 test -d ${WINLIB} || mkdir -p ${WINLIB}
-cp $(dpkg -S *.dll | sed -n 's,.*-'"${ARCH//_/-}"'.*: ,,p')  ${WINLIB}/
+cp $(dpkg -S *.dll | sed -n '/-posix\//d;s,.*-'"${ARCH//_/-}"'.*: ,,p')  ${WINLIB}/
 
 if test $zip -eq 1; then
     cd "${TARGET}"
