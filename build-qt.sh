@@ -82,7 +82,7 @@ if test $download -eq 1; then
         version=$(git branch -r | sed -n 's,^ *origin/\([0-9.]\+\)$,\1,p' | tail -1)
     fi
     git checkout "$version"
-    perl init-repository
+    perl init-repository --module-subset=default,-qtwebkit,-qtwebkit-examples,-qtwebengine
 elif test -d qt5; then
     cd qt5
 fi
