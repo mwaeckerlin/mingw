@@ -38,5 +38,6 @@ WORKDIR /workdir
 RUN chmod ugo+wrx /workdir
 
 ENTRYPOINT ["/bin/bash"]
+CMD ""
 
 VOLUME /workdir
