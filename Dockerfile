@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
     libdbus-1-dev libfontconfig1-dev libcap-dev libxtst-dev \
     libpulse-dev libudev-dev libpci-dev libnss3-dev libasound2-dev \
     libxss-dev libegl1-mesa-dev gperf bison \
-    libasound2-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
+    libasound2-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev wget
 
 ADD build-openssl.sh /build-openssl.sh
 ADD build-icu.sh /build-icu.sh
