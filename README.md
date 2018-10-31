@@ -1,10 +1,13 @@
-# MinGW Docker Build Image
+MinGW Docker Build Image
+========================
 
 Build Scripts for Cross Compiling Windows Targets in an Ubuntu Docker Container.
 
 See also: [my blog](https://marc.wäckerlin.ch/computer/cross-compile-openssl-for-windows-on-linux)
 
-## Build Scripts
+
+Build Scripts
+-------------
 
 List all available build scripts:
 
@@ -21,13 +24,17 @@ Show options e.g. for building OpenSSL:
 
     docker run -it --rm mwaeckerlin/mingw /build-openssl.sh -h
 
-## Add Required DLLs
+
+Add Required DLLs
+-----------------
 
 Some MinGW DLLs are required for running the builds on Windows. Install them into the installation directory using the script `install-dll.sh`:
 
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /install-dll.sh
 
-## Environment Variables
+
+Environment Variables
+---------------------
 
  - `MINGW`              mingw parameter (default: detect from `ARCH` or `x86_64-w64-mingw32`)
  - `PREFIX`             relative installation prefix (default: `usr`)
@@ -42,7 +49,8 @@ Some MinGW DLLs are required for running the builds on Windows. Install them int
  - `WINLIB`             path to required windows libraries (default: `WINREQ/exe`)
 
     
-## Build Generic Projects
+Build Generic Projects
+----------------------
 
 You can build any project, that is based on the [Bootstrap Build Environment](https://dev.marc.waeckerlin.org/redmine/projects/bootstrap-build-environment), i.e. my own projects:
 
@@ -63,19 +71,25 @@ The projects proxyface and libpcscxx require Qt, so build them after the lines a
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/proxyface/trunk -n proxyface
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build.sh -s https://dev.marc.waeckerlin.org/svn/libpcscxx/trunk -n libpcscxx --enable-pkcs11-download
 
-## Build OpenSSL
+
+Build OpenSSL
+-------------
 
 Compile latest OpenSSL in the current working directory:
 
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
 
-## Build ICU
+
+Build ICU
+---------
 
 Build ICU version 57-1 in the current working directory:
 
     docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d -v 57-1
 
-## Build Qt5
+
+Build Qt5
+---------
 
 - Script: `/build-qt.sh -d`
 - Requires: `/build-openssl.sh`, `build-icu.sh`
