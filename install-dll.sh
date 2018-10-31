@@ -11,6 +11,7 @@ BUILD_NUMBER=${BUILD_NUMBER:-0}
 ARCH=${ARCH:-${MINGW%%-*}}
 WINLIB=${WINLIB:-${WINREQ}/exe}
 
+name=
 zip=0
 while test $# -gt 0; do
     case "$1" in
@@ -22,6 +23,7 @@ OPTIONS:
 
   -h, --help         show this help
   -z, --zip          create zip package
+  -n, --name [name]  project name
 
 VARIABLES:
 
@@ -38,6 +40,7 @@ Copies required DLLs to ${WINLIB}
 EOF
             exit
             ;;
+        (-n|--name) shift; name="$1";;
         (-z|--zip) zip=1;;
         (*) break;;
     esac
@@ -48,7 +51,17 @@ EOF
     shift
 done
 
+if test -z "$name" -o "$name" = "."; then
+    name=$(sed -n 's,PACKAGE_NAME = ,,p' makefile)
+fi
+version=$(sed -n 's,PACKAGE_VERSION = ,,p' makefile)
+set +x
+echo "======================================================"
+echo "Version: $version"
+echo "Package: $name"
+echo "======================================================"
 set -x
+[ -n "$name" ] && [[ "$version" =~ ^[0-9.]+$ ]]
 
 test -d ${WINLIB} || mkdir -p ${WINLIB}
 cp $(dpkg -S *.dll | sed -n '/-posix\//d;s,.*-'"${ARCH//_/-}"'.*: ,,p')  ${WINLIB}/
