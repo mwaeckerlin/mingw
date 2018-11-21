@@ -129,6 +129,7 @@ sed -i '/# *if *defined *( *_WIN32_IE *) *&& *_WIN32_IE *<< *0x0700/{s,<<,<,}' q
 
 make
 make install
+chmod -R u+rw "${TARGET}"
 
 # bugfixes:
 #  Qt pkg-config files link to debug version in release build

@@ -119,6 +119,7 @@ set -x
 [ -n "$name" ] && [[ "$version" =~ ^[0-9.]+$ ]]
 make
 make install
+chmod -R u+rw "${TARGET}"
 
 if test $zip -eq 1; then
     cd "${TARGET}"

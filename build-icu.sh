@@ -111,6 +111,7 @@ cd ../build-win
     --libexecdir="${TARGET}/$LIBDIR"
 make
 make install
+chmod -R u+rw "${TARGET}"
 
 if test $zip -eq 1; then
     cd "${TARGET}"
