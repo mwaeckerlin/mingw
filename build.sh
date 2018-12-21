@@ -94,17 +94,30 @@ if test -n "$name"; then
     cd "$name"
 fi
 
-./bootstrap.sh -c \
-    --host=${MINGW} \
-    --prefix="${TARGET}/${PREFIX}" \
-    --bindir="${TARGET}/$BINDIR" \
-    --sbindir="${TARGET}/$BINDIR" \
-    --libdir="${TARGET}/$LIBDIR" \
-    --libexecdir="${TARGET}/$LIBDIR" \
-    CPPFLAGS="-I${WININC}" \
-    LDFLAGS="-L${WINLIB}" \
-    PKG_CONFIG_PATH="${WINLIB}/pkgconfig" \
-    $*
+if test -x ./bootstrap.sh; then
+    ./bootstrap.sh -c \
+                   --host=${MINGW} \
+                   --prefix="${TARGET}/${PREFIX}" \
+                   --bindir="${TARGET}/$BINDIR" \
+                   --sbindir="${TARGET}/$BINDIR" \
+                   --libdir="${TARGET}/$LIBDIR" \
+                   --libexecdir="${TARGET}/$LIBDIR" \
+                   CPPFLAGS="-I${WININC}" \
+                   LDFLAGS="-L${WINLIB}" \
+                   PKG_CONFIG_PATH="${WINLIB}/pkgconfig" \
+                   $*
+elif test -x ./configure; then
+    ./configure --host=${MINGW} \
+                --prefix="${TARGET}/${PREFIX}" \
+                --bindir="${TARGET}/$BINDIR" \
+                --sbindir="${TARGET}/$BINDIR" \
+                --libdir="${TARGET}/$LIBDIR" \
+                --libexecdir="${TARGET}/$LIBDIR" \
+                CPPFLAGS="-I${WININC}" \
+                LDFLAGS="-L${WINLIB}" \
+                PKG_CONFIG_PATH="${WINLIB}/pkgconfig" \
+                $*
+fi
 
 if test -z "$name" -o "$name" = "."; then
     name=$(sed -n 's,PACKAGE_NAME = ,,p' makefile)
