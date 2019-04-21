@@ -94,10 +94,10 @@ Build Qt5
 - Script: `/build-qt.sh -d`
 - Requires: `/build-openssl.sh`, `build-icu.sh`
 
-    mkdir -p /tmp/build/usr
-    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
-    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d
-    docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
+        mkdir -p /tmp/build/usr
+        docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-openssl.sh -d
+        docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-icu.sh -d
+        docker run -it --rm -v /tmp/build:/workdir -u $(id -u) mwaeckerlin/mingw /build-qt.sh -d
 
 Now in `/tmp/build` you find:
 - `usr` with an installation of all the build targets
