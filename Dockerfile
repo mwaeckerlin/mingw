@@ -22,8 +22,7 @@ RUN apt-get update \
       default-jre-headless \
       make subversion g++ git \
       qt5-default qtbase5-dev-tools qttools5-dev-tools \
-      flex bison gperf ruby bison wget less \
- && /cleanup.sh
+      flex bison gperf ruby bison wget less
 
 ADD README.md /README.md
 ADD build-openssl.sh /build-openssl.sh

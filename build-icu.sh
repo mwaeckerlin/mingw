@@ -60,12 +60,9 @@ set -x
 cd ${WORKSPACE}
 if test $download -eq 1; then
     if test -z "$version"; then
-        version=$(wget -qO- http://source.icu-project.org/repos/icu/icu/tags | sed -n 's,.*href="release-\([0-9]\+-[0-9]\+\)/".*,\1,p' | tail -1)
-        # bugfix: 58-1 does not compile
-        if test "$version" = "58-1"; then
-            version="57-1"
-        fi
-        tag="release-${version}"
+        json=$(wget -qO- https://api.github.com/repos/unicode-org/icu/releases/latest)
+        tag=$(sed -n 's,.*"tag_name": *"\(.*\)".*,\1,p' <<<"$json")
+        version=${tag#release-}
     else
         if [[ "$version" =~ ^[0-9.]+$ ]]; then
             tag="release-${version}"
@@ -77,11 +74,13 @@ if test $download -eq 1; then
             fi
         fi
     fi
-    source=http://source.icu-project.org/repos/icu/icu/tags/release-${version}
-    svn co $source icu-${version}
-    cd icu-${version}
+    source=https://github.com/unicode-org/icu/archive/${tag}.tar.gz
+    wget -qO- $source | tar xz
+    cd icu-${tag}
 elif test -n "${version}" -a -d icu-${version}; then
     cd icu-${version}
+elif test -n "${version}" -a -d icu-release-${version}; then
+    cd icu-release-${version}
 elif test -z "${version}" -a -d icu-*; then
     version=$(ls -d icu-* | sed 's,icu-,,')
     cd icu-${version}
@@ -98,10 +97,10 @@ echo "Package: $path"
 test -d build-lin || mkdir build-lin
 test -d build-win || mkdir build-win
 cd build-lin
-../source/configure
+../icu4c/source/configure
 make
 cd ../build-win
-../source/configure \
+../icu4c/source/configure \
     --host=${MINGW} \
     --with-cross-build=$(pwd)/../build-lin \
     --prefix="${TARGET}/${PREFIX}" \

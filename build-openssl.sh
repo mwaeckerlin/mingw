@@ -63,9 +63,9 @@ if test $download -eq 1; then
     if test -n "$version"; then
         file=openssl-${version}.tar.gz
     else
-        #file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-[0-9][^"]*\.tar\.gz\)".*,\1,p'  | head -1)
+        file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-[0-9][^"]*\.tar\.gz\)".*,\1,p' | sort -rV | head -1)
         # use old version 1.0.x, because Qt < 5.10 cannot handle 1.1.x
-        file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-1.0.[0-9][^"]*\.tar\.gz\)".*,\1,p'  | head -1)
+        #file=$(wget -qO- $source | sed -n 's,.*<a *href="\(openssl-1.0.[0-9][^"]*\.tar\.gz\)".*,\1,p' | sort -rV | head -1)
     fi
     path=${file%.tar.gz}
     wget -qO$file $source/$file
